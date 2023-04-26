@@ -17,6 +17,9 @@ public class RubyController : MonoBehaviour
 
     public AudioClip throwSound;
     public AudioClip hitSound;
+    public AudioClip jambisound;
+    public AudioClip winsound;
+    public AudioClip losesound;
 
     bool isInvincible;
     float invincibleTimer;
@@ -34,6 +37,8 @@ public class RubyController : MonoBehaviour
     public ParticleSystem hitEffect;
 
     public GameObject loseText;
+    public GameObject winAudioText;
+    public GameObject loseAudioText;
     private bool playerLose;
 
     // Start is called before the first frame update
@@ -49,6 +54,10 @@ public class RubyController : MonoBehaviour
         playerLose = false;
 
         loseText.SetActive(false);
+
+        winAudioText.SetActive(false);
+
+        loseAudioText.SetActive(false);
     }
 
     public void PlaySound(AudioClip clip)
@@ -85,6 +94,8 @@ public class RubyController : MonoBehaviour
         {
             speed = 0;
             playerLose = true;
+            audioSource.Stop();
+            audioSource.PlayOneShot(losesound);
             loseText.SetActive(true);
         }
 
@@ -102,8 +113,51 @@ public class RubyController : MonoBehaviour
                 if (character != null)
                 {
                     character.DisplayDialog();
+                    PlaySound(jambisound);
                 }
             }
+        }
+
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            RaycastHit2D hit = Physics2D.Raycast(rigidbody2d.position + Vector2.up * 0.2f, lookDirection, 1.5f, LayerMask.GetMask("Plingo"));
+            if (hit.collider != null)
+            {
+                NonPlayerCharacter character = hit.collider.GetComponent<NonPlayerCharacter>();
+                if (character != null)
+                {
+                    character.DisplayDialog();
+                    PlaySound(jambisound);
+                }
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            audioSource.Stop();
+            PlaySound(winsound);
+            winAudioText.SetActive(true);
+        }
+
+        if (Input.GetKeyUp(KeyCode.Q))
+        {
+            audioSource.Stop();
+            audioSource.Play();
+            winAudioText.SetActive(false);
+        }
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            audioSource.Stop();
+            PlaySound(losesound);
+            loseAudioText.SetActive(true);
+        }
+
+        if (Input.GetKeyUp(KeyCode.E))
+        {
+            audioSource.Stop();
+            audioSource.Play();
+            loseAudioText.SetActive(false);
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))
